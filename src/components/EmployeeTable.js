@@ -1,35 +1,51 @@
 import {Component} from "react";
-import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 class EmployeeTable extends Component{
     state = {
-        employees:[]
+        nameSort:""
     }
 
-    componentDidMount() {
-        let employees = [];
+    getNameSortIcon = () => {
+        switch(this.state.nameSort) {
+            case "asc":
+                return "fa fa-sort-up";
+            case "dsc":
+                return "fas fa-sort-down";
+            default:
+                return "fa fa-sort";
+        }
+    }
 
-        axios.get("https://randomuser.me/api/?results=500").then(res => {
-            employees = res.data.results;
-            this.setState({employees: employees});
-        })
-        
-
+    handleNameSortBtn = () => {
+        if(this.state.nameSort === "asc") {
+            this.setState({nameSort: "dsc"});
+        } else {
+            this.setState({nameSort: "asc"});
+        }
     }
 
     render() {
+        const employees = this.props.employees;
+        if(this.state.nameSort === "asc") {
+            employees.sort((a, b) => a.name.first.toUpperCase()<b.name.first.toUpperCase()?-1:1);
+        } else if (this.state.nameSort === "dsc") {
+            employees.sort((a, b) => a.name.first.toUpperCase()<b.name.first.toUpperCase()?1:-1);
+        }
         return (
             <table className="table table-striped table-responsive">
                 <thead>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Gender</th>
-                    <th>Address</th>
+                    <tr>
+                        <th>
+                            Name <button className="btn" onClick={this.handleNameSortBtn}><i className={this.getNameSortIcon()} aria-hidden="true"></i></button>
+                        </th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Address</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    {this.state.employees.map(employee => <tr key={employee.login.uuid}>
+                    {employees.map(employee => <tr key={employee.login.uuid}>
                         <td>{employee.name.first} {employee.name.last}</td>
                         <td>{employee.email}</td>
                         <td>{employee.phone}</td>
